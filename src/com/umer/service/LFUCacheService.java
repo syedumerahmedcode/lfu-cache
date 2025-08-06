@@ -24,7 +24,7 @@ public class LFUCacheService {
     /**
      * Used for storing frequency of each key.
      */
-    private final Map<Integer, Integer> frequency;
+    private final Map<Integer, Integer> frequencies;
 
     /**
      * frequency -> (key -> value)
@@ -35,12 +35,33 @@ public class LFUCacheService {
         this.capacity = capacity;
         this.minFrequency = 0;
         this.values = new HashMap<>();
-        this.frequency = new HashMap<>();
+        this.frequencies = new HashMap<>();
         this.frequencyMap = new HashMap<>();
     }
 
     public int get(int key) {
-        return -1;
+        // first check if the key even exist or not? If not return -1
+        if (!values.containsKey(key)) {
+            return -1;
+        }
+        // Update frequency
+        // TODO: Better naming is required than frequency.
+        int frequency = frequencies.get(key);
+        frequencies.put(key, frequency + 1);
+        frequencyMap.get(frequency).remove(key);
+
+        // Update minFrequency
+        if (frequencyMap.get(frequency).isEmpty()) {
+            frequencyMap.remove(frequency);
+            if (minFrequency == frequency) {
+                minFrequency++;
+            }
+        }
+
+        // Add to the next frequency
+        // TODO: Please research more about computeIfAbsent()
+        frequencyMap.computeIfAbsent(frequency + 1, k -> new TreeMap<>()).put(key, key);
+        return values.get(key);
     }
 
 }
