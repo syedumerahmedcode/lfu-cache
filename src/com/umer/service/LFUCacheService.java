@@ -42,7 +42,7 @@ public class LFUCacheService {
     public int get(int key) {
         // first check if the key even exist or not? If not return -1
         if (!values.containsKey(key)) {
-            return -1;
+            return -1; // Key not found
         }
         // Update frequency
         // TODO: Better naming is required than frequency.
@@ -60,7 +60,7 @@ public class LFUCacheService {
 
         // Add to the next frequency
         // TODO: Please research more about computeIfAbsent()
-        frequencyMap.computeIfAbsent(frequency + 1, k -> new TreeMap<>()).put(key, key);
+        frequencyMap.computeIfAbsent(frequency + 1, k -> new TreeMap<>()).put(key, values.get(key));
         return values.get(key);
     }
 
@@ -86,7 +86,7 @@ public class LFUCacheService {
             frequencyMap.get(minFrequency).remove(evictKey);
             values.remove(evictKey);
             frequencies.remove(evictKey);
-            // TODO: Please resrach more about this.
+            // TODO: Please research more about this.
             if (frequencyMap.get(minFrequency).isEmpty()) {
                 frequencyMap.remove(minFrequency);
             }
@@ -97,7 +97,7 @@ public class LFUCacheService {
         // This helps in setting up the initial frequency of the key provided in the
         // method.
         frequencies.put(key, 1);
-        // TODO: Please resrach more about this.
+        // TODO: Please research more about this.
         minFrequency = 1;
         frequencyMap.computeIfAbsent(1, k -> new TreeMap<>()).put(key, value);
     }
